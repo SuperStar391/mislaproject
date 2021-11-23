@@ -1,12 +1,12 @@
-import React, { memo } from "react";
+import React, { memo, useMemo } from "react";
 import PropTypes from "prop-types";
 
-function itemize(text) {
+function itemize(text, transformer) {
   const letters = text
     .split("")
     .filter((l) => l != " ")
     .reduce((collection, item) => {
-      const letter = item.toLowerCase();
+      const letter = transformer ? transformer(item) : item;
       return {
         ...collection,
         [letter]: (collection[letter] || 0) + 1,
@@ -16,11 +16,15 @@ function itemize(text) {
   return Object.entries(letters).sort((a, b) => b[1] - a[1]);
 }
 
-function CharacterMap({ showExplanation, text }) {
+function CharacterMap({ showExplanation, text, transformer }) {
+  const characters = useMemo(() => itemize(text, transformer), [text, transformer]);
   return (
     <div>
+      {showExplanation && (
+        <p>This displays a list of the most common characters.</p>
+      )}
       Character Map:
-      {itemize(text).map((character) => (
+      {characters.map((character) => (
         <div key={character[0]}>
           {character[0]}: {character[1]}
         </div>
@@ -30,7 +34,13 @@ function CharacterMap({ showExplanation, text }) {
 }
 
 CharacterMap.protoTypes = {
+  showExplanation: PropTypes.bool.isRequired,
   text: PropTypes.string.isRequired,
+  transformer: PropTypes.func
 };
+
+CharacterMap.defaultProps = {
+  transformer: null
+}
 
 export default memo(CharacterMap);

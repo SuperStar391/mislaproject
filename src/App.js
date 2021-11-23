@@ -1,4 +1,4 @@
-import React, { useState, useReducer } from 'react'
+import React, { useState, useReducer, useCallback } from 'react'
 import './App.css';
 
 import CharacterMap from './components/CharacterMap';
@@ -6,6 +6,7 @@ import CharacterMap from './components/CharacterMap';
 function App() {
   const [text, setText] = useState('');
   const [showExplanation, toggleExplanation] = useReducer(state => !state, false)
+  const transformer = useCallback(item => item.toLowerCase(), [])
 
   return (
     <div className="wrapper">
@@ -23,12 +24,7 @@ function App() {
       <div>
         <button onClick={toggleExplanation}>Show Explanation</button>
       </div>
-      {showExplanation &&
-        <p>
-          This displays a list of the most common characters.
-        </p>
-      }
-      <CharacterMap text={text} />
+      <CharacterMap showExplanation={showExplanation} text={text} transformer={transformer} />
     </div>
   );
 }
